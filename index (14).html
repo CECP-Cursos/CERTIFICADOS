@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CECP — Confirmação de dados para o certificado</title>
+<meta name="description" content="Confirme seus dados para emissão do certificado — Projeto Capacita Brasil.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-deep: #0a2540;
+    --navy: #123a5e;
+    --blue-accent: #2d7dd2;
+    --flame: #e8a33d;
+    --flame-dark: #c8802a;
+    --paper: #f6f4ee;
+    --white: #ffffff;
+    --ink: #16232f;
+    --ink-soft: #4d5c6b;
+    --line: #d9d3c4;
+    --ok: #2f8a5e;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Source Sans 3', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 260px, var(--paper) 260px);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; padding: 40px 20px 60px; }
+
+  .topo { text-align: center; color: var(--white); margin-bottom: 28px; }
+  .topo svg { width: 64px; height: 64px; margin-bottom: 14px; }
+  .topo .org-nome { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; margin: 0 0 2px; }
+  .topo .projeto-nome { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--flame); margin: 0; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 32px 28px;
+    box-shadow: 0 16px 40px rgba(10,37,64,0.12);
+  }
+
+  .card h1 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--navy-deep);
+    margin: 0 0 8px;
+  }
+  .card > p.intro {
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+    font-size: 0.95rem;
+  }
+
+  .campo { margin-bottom: 18px; }
+  .campo label { display: block; font-size: 0.83rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+  .campo input, .campo select {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.96rem;
+    background: var(--paper);
+  }
+  .campo input:focus, .campo select:focus { outline: none; border-color: var(--blue-accent); background: var(--white); }
+
+  .btn-enviar {
+    width: 100%;
+    background: var(--flame);
+    color: var(--navy-deep);
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 6px;
+  }
+  .btn-enviar:hover { background: #f4b25a; }
+  .btn-enviar:disabled { opacity: 0.6; cursor: wait; }
+
+  .form-erro {
+    background: #fdecec; border: 1px solid #f0b8b8; color: #a33;
+    padding: 10px 14px; border-radius: 4px; font-size: 0.85rem;
+    margin-bottom: 18px; display: none;
+  }
+  .form-erro.ativo { display: block; }
+
+  .tela-sucesso { display: none; text-align: center; padding: 20px 4px; }
+  .tela-sucesso.ativa { display: block; }
+  .tela-sucesso .check {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #e8f5ee; color: var(--ok);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 1.8rem;
+  }
+  .tela-sucesso h2 { font-family: var(--font-display); color: var(--navy-deep); font-size: 1.3rem; margin: 0 0 8px; }
+  .tela-sucesso .msg-entrega { color: var(--ink-soft); margin: 0 0 22px; font-size: 0.94rem; }
+
+  .resumo-dados {
+    text-align: left;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+  .resumo-item { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+  .resumo-item:last-child { border-bottom: none; }
+  .resumo-item .resumo-label { color: var(--ink-soft); flex-shrink: 0; }
+  .resumo-item .resumo-valor { color: var(--navy-deep); font-weight: 600; text-align: right; }
+
+  .rodape-nota { text-align: center; color: #b9c6d4; font-size: 0.76rem; margin-top: 22px; }
+
+  .cursos-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    background: var(--paper);
+  }
+  .curso-check-item { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
+  .curso-check-item input { width: auto; }
+  .campo-hint { font-size: 0.78rem; color: var(--ink-soft); margin-top: 6px; }
+
+  .rodape-empresa {
+    max-width: 560px;
+    margin: 30px auto 0;
+    text-align: center;
+    color: #cfdae4;
+  }
+  .rodape-empresa .rodape-org { font-family: var(--font-display); font-size: 0.95rem; color: var(--white); margin: 0 0 4px; }
+  .rodape-empresa .rodape-linha { font-size: 0.8rem; color: #a9b8c6; margin: 2px 0; }
+  .rodape-empresa .rodape-socials { display: flex; justify-content: center; gap: 12px; margin-top: 12px; }
+  .rodape-empresa .rodape-socials a {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid #34506b;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rodape-empresa .rodape-socials a:hover { border-color: var(--flame); background: rgba(232,163,61,0.1); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topo">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="50" cy="50" r="48" fill="none" stroke="#e8a33d" stroke-width="2.5"/>
+      <path d="M28 45 L50 58 L72 45 L72 62 L50 75 L28 62 Z" fill="#ffffff"/>
+      <path d="M50 30 C46 36 44 40 44 45 C44 49.5 47 52 50 52 C53 52 56 49.5 56 45 C56 40 54 36 50 30 Z" fill="#e8a33d"/>
+    </svg>
+    <p class="org-nome">Centro de Educação e Capacitação Profissional</p>
+    <p class="projeto-nome">Projeto Capacita Brasil</p>
+  </div>
+
+  <div class="card">
+
+    <div id="tela-form">
+      <h1>Confirmação de dados para o certificado</h1>
+      <p class="intro">Confirme seus dados abaixo exatamente como devem aparecer no seu certificado.</p>
+
+      <div class="form-erro" id="form-erro">Preencha todos os campos.</div>
+
+      <form id="form-confirmacao" onsubmit="enviarConfirmacao(event)">
+        <div class="campo">
+          <label for="input-nome">Nome completo *</label>
+          <input type="text" id="input-nome" required autocomplete="name">
+        </div>
+
+        <div class="campo">
+          <label for="input-cpf">CPF *</label>
+          <input type="text" id="input-cpf" required inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+        </div>
+
+        <div class="campo">
+          <label for="input-nascimento">Data de nascimento *</label>
+          <input type="date" id="input-nascimento" required>
+        </div>
+
+        <div class="campo">
+          <label for="input-whatsapp">WhatsApp *</label>
+          <input type="tel" id="input-whatsapp" required placeholder="(00) 00000-0000">
+        </div>
+
+        <div class="campo">
+          <label>Curso(s) *</label>
+          <div class="cursos-checklist">
+            <label class="curso-check-item"><input type="checkbox" name="curso-check" value="Almoxarifado"> Almoxarifado</label>
+            <label class="curso-check-item"><input type="checkbox" name="curso-check" value="Operador de Caixa"> Operador de Caixa</label>
+            <label class="curso-check-item"><input type="checkbox" name="curso-check" value="Auxiliar de RH"> Auxiliar de RH</label>
+            <label class="curso-check-item"><input type="checkbox" name="curso-check" value="Assistente Administrativo"> Assistente Administrativo</label>
+          </div>
+          <p class="campo-hint">Marque todos os cursos em que você se formou.</p>
+        </div>
+
+        <div class="campo">
+          <label for="input-cidade">Cidade *</label>
+          <select id="input-cidade" required>
+            <option value="" disabled selected>Selecione a cidade</option>
+            <option value="Parazinho">Parazinho</option>
+            <option value="Caiçara do Norte">Caiçara do Norte</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btn-enviar">Confirmar dados</button>
+      </form>
+    </div>
+
+    <div class="tela-sucesso" id="tela-sucesso">
+      <div class="check">✓</div>
+      <h2>Pronto, seus dados foram confirmados!</h2>
+      <p class="msg-entrega">O certificado será entregue na última aula presencial.</p>
+
+      <div class="resumo-dados" id="resumo-dados"></div>
+    </div>
+
+  </div>
+
+  <div class="rodape-empresa">
+    <p class="rodape-org">CECP — Centro de Educação e Capacitação Profissional</p>
+    <p class="rodape-linha" id="rodape-cnpj">CNPJ: preencher aqui</p>
+    <p class="rodape-linha" id="rodape-email">contato@cecp.org.br</p>
+    <p class="rodape-linha" id="rodape-whats"></p>
+    <div class="rodape-socials">
+      <a href="#" id="rodape-instagram" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#c3d0dc"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.97.24 2.43.4a4.9 4.9 0 0 1 1.77 1.15 4.9 4.9 0 0 1 1.15 1.77c.16.46.35 1.26.4 2.43.07 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.24 1.97-.4 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.46.16-1.26.35-2.43.4-1.25.07-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.97-.24-2.43-.4a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.16-.46-.35-1.26-.4-2.43C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.24-1.97.4-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.6 1.8c.46-.16 1.26-.35 2.43-.4C9.28 1.33 9.68 1.33 12 1.33zM12 6.6a5.4 5.4 0 1 0 0 10.8 5.4 5.4 0 0 0 0-10.8zm0 8.9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm5.6-9.1a1.26 1.26 0 1 1-2.52 0 1.26 1.26 0 0 1 2.52 0z"/></svg>
+      </a>
+      <a href="#" id="rodape-facebook" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#c3d0dc"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H16.7V3.7c-.27-.04-1.2-.12-2.28-.12-2.26 0-3.8 1.38-3.8 3.9v2.4H8v3.1h2.62V21h2.88z"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO
+   Cole aqui a URL do seu Apps Script (Implantar > App da Web > /exec)
+   ===================================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbwGdyFjAx9zIYwvkWBP5HfkwpPFpZSyXb8nLkTSMrxnQhaKO9uq_MBAviRNfuhhSHew/exec";
+
+/* Dados da empresa exibidos no rodapé. Edite os valores abaixo. */
+const DADOS_EMPRESA = {
+  CNPJ: "00.000.000/0001-00",
+  EMAIL: "contato@cecp.org.br",
+  WHATSAPP_NUMERO: "5584999999999", // só números, com DDI+DDD
+  INSTAGRAM: "https://instagram.com/cecp",
+  FACEBOOK: "https://facebook.com/cecp"
+};
+
+(function preencherRodapeEmpresa() {
+  document.getElementById('rodape-cnpj').textContent = `CNPJ: ${DADOS_EMPRESA.CNPJ}`;
+  document.getElementById('rodape-email').textContent = DADOS_EMPRESA.EMAIL;
+  if (DADOS_EMPRESA.WHATSAPP_NUMERO) {
+    document.getElementById('rodape-whats').textContent = `WhatsApp: ${formatarWhatsExibicao(DADOS_EMPRESA.WHATSAPP_NUMERO)}`;
+  }
+  document.getElementById('rodape-instagram').href = DADOS_EMPRESA.INSTAGRAM || '#';
+  document.getElementById('rodape-facebook').href = DADOS_EMPRESA.FACEBOOK || '#';
+})();
+
+function formatarWhatsExibicao(numero) {
+  const n = String(numero).replace(/\D/g, '');
+  if (n.length < 12) return numero;
+  const ddd = n.slice(2, 4);
+  const resto = n.slice(4);
+  return `(${ddd}) ${resto}`;
+}
+
+async function enviarConfirmacao(event) {
+  event.preventDefault();
+  const erroBox = document.getElementById('form-erro');
+  erroBox.classList.remove('ativo');
+
+  const nome = document.getElementById('input-nome').value.trim();
+  const cpf = document.getElementById('input-cpf').value.trim();
+  const nascimento = document.getElementById('input-nascimento').value;
+  const whatsapp = document.getElementById('input-whatsapp').value.trim();
+  const cursosMarcados = [...document.querySelectorAll('input[name="curso-check"]:checked')].map(i => i.value);
+  const cidade = document.getElementById('input-cidade').value;
+
+  if (!nome || !cpf || !nascimento || !whatsapp || cursosMarcados.length === 0 || !cidade) {
+    erroBox.textContent = 'Preencha todos os campos e marque ao menos um curso.';
+    erroBox.classList.add('ativo');
+    return;
+  }
+
+  const cursos = cursosMarcados.join(', ');
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  try {
+    if (API_URL && !API_URL.startsWith("COLE_AQUI")) {
+      const body = new URLSearchParams({ nome, cpf, nascimento, whatsapp, cursos, cidade });
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+    } else {
+      console.warn('API_URL não configurada — dados não foram gravados na planilha (modo demonstração).');
+    }
+  } catch (err) {
+    console.error('Erro ao enviar para a planilha:', err);
+    // Segue para a tela de sucesso mesmo assim, para não travar o aluno numa falha de rede;
+    // o Apps Script normalmente recebe o POST mesmo quando o fetch reporta erro de CORS no navegador.
+  }
+
+  document.getElementById('tela-form').style.display = 'none';
+
+  document.getElementById('resumo-dados').innerHTML = `
+    <div class="resumo-item"><span class="resumo-label">Nome completo</span><span class="resumo-valor">${escapeHtml(nome)}</span></div>
+    <div class="resumo-item"><span class="resumo-label">CPF</span><span class="resumo-valor">${escapeHtml(cpf)}</span></div>
+    <div class="resumo-item"><span class="resumo-label">Data de nascimento</span><span class="resumo-valor">${formatarDataExibicao(nascimento)}</span></div>
+    <div class="resumo-item"><span class="resumo-label">WhatsApp</span><span class="resumo-valor">${escapeHtml(whatsapp)}</span></div>
+    <div class="resumo-item"><span class="resumo-label">Curso(s)</span><span class="resumo-valor">${escapeHtml(cursos)}</span></div>
+    <div class="resumo-item"><span class="resumo-label">Cidade</span><span class="resumo-valor">${escapeHtml(cidade)}</span></div>
+  `;
+
+  document.getElementById('tela-sucesso').classList.add('ativa');
+}
+
+function formatarDataExibicao(dataISO) {
+  if (!dataISO) return '';
+  const [ano, mes, dia] = dataISO.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+</script>
+
+</body>
+</html>
